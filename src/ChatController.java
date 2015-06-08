@@ -10,7 +10,11 @@ public class ChatController {
 	
 	public ChatController(ChatView chatViewIn, Socket socketIn){
 		theChatView = chatViewIn;
-                parser = new MessageParser();
+                try {
+                    parser = new MessageParser();
+                } catch(Exception e){
+                    e.printStackTrace();
+                }
 	}
 	
 	public void sendMessage(){
