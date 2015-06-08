@@ -9,18 +9,28 @@ public class ChatView extends JPanel implements ActionListener{
 	JButton sendButton;
 	JButton sendFileButton;
 	JButton closeButton;
+	
 	JEditorPane conversationPane;
+	
 	JTextArea typingPane;
+	
 	JScrollPane scrollPane;
+	
 	GridBagConstraints c;
-	MainController theParentController;
+	
 	ChatController theChatController;
+	
 	Color colorChosen;
+	
 	JScrollBar vertical;
+	
 	HTMLEditorKit editor;
 	
-	public ChatView(MainController parentControllerIn, String nameOfTab){
-		theParentController = parentControllerIn;
+	int index;
+	
+	public ChatView(int indexIn){
+		index = indexIn;
+		
 		theChatController = new ChatController(this);
 		colorChosen = Color.BLACK;
 		
@@ -104,6 +114,10 @@ public class ChatView extends JPanel implements ActionListener{
 		String textFieldContent = typingPane.getText();
 		typingPane.setText("");
 		return textFieldContent;
+	}
+	
+	public Color getColor(){
+		return colorChosen;
 	}
 	
 }

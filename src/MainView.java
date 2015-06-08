@@ -6,23 +6,26 @@ import java.awt.*;
 public class MainView extends JFrame implements ActionListener{
 	
 	int listeningPort;
+	
 	MainController theMainController;
-	JTabbedPane theTabbedPane;
+
 	JPanel thePanel;
+	
 	JMenuBar theMenuBar;
+	
 	JMenu theMenu;
+	
 	JMenuItem connectItem;
 	JMenuItem groupChatItem;
 	JMenuItem settingsItem;
 	JMenuItem quitItem;
-	Listener listener;
-	String myNick;
-	String myClan;
-	static int numberOfTabs = 0;
 	
-	//for testing purposes
-	MainModel exampleModel;
+	static String myNick;
+	static String myClan;
 	
+	//example model
+	MainModel exampleModel = new MainModel("Bosse","haxxerz",666);
+		
 	public MainView(){
 		super("Yooha Messenger!");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -33,8 +36,6 @@ public class MainView extends JFrame implements ActionListener{
 		myClan = JOptionPane.showInputDialog("plan yo clan");
 		
 		theMainController = new MainController(listeningPort,this);
-		
-		listener = new Listener();
 		
 		// menu & items
 		theMenuBar = new JMenuBar();
@@ -56,16 +57,12 @@ public class MainView extends JFrame implements ActionListener{
 		theMenu.add(quitItem);
 		theMenuBar.add(theMenu);
 		
-		//sample model 
-		exampleModel = new MainModel("Bosse","haxxerz",666);
-		
 		add(theMainController);
 		setJMenuBar(theMenuBar);
 		pack();
 		setVisible(true);
 		
-		// theMainController.newChat(exampleModel);
-		
+		theMainController.newChat(exampleModel);
 	}
 	
 	public void actionPerformed(ActionEvent e){
@@ -114,11 +111,11 @@ public class MainView extends JFrame implements ActionListener{
 		}
 	}
 	
-	public String getNick(){
+	public static String getNick(){
 		return myNick;
 	}
 	
-	public String getClan(){
+	public static String getClan(){
 		return myClan;
 	}
 	
