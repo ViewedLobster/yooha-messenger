@@ -2,6 +2,7 @@ import java.awt.*;
 import javax.swing.text.html.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.net.*;
 
 public class ChatView extends JPanel implements ActionListener{
 	
@@ -28,10 +29,10 @@ public class ChatView extends JPanel implements ActionListener{
 	
 	int index;
 	
-	public ChatView(int indexIn){
+	public ChatView(int indexIn, Socket socketIn){
 		index = indexIn;
 		
-		theChatController = new ChatController(this);
+		theChatController = new ChatController(this,socketIn);
 		colorChosen = Color.BLACK;
 		
 		setLayout(new GridBagLayout());
@@ -105,6 +106,7 @@ public class ChatView extends JPanel implements ActionListener{
 			
 		}else if(e.getSource() == sendButton){
 			theChatController.sendMessage();
+			raise();
 		}else if(e.getSource() == colorChooserButton){
 			colorChosen = JColorChooser.showDialog(null, "Välj färj", colorChosen);
 		}
@@ -112,11 +114,6 @@ public class ChatView extends JPanel implements ActionListener{
 	
 	public void raise(){
 		vertical.setValue(vertical.getMaximum());
-	}
-	
-	public void printToPane(String stringIn){
-		conversationPane.setText(conversationPane.getText()+stringIn);
-		raise();
 	}
 	
 	public String getTextFieldContent(){

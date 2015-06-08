@@ -4,12 +4,14 @@ import java.net.*;
 
 public class Server {
     private ServerSocket serverSocket;
+    private MainController mainController;
 
-    public Server(int portNo){
+    public Server(int portNo, MainController mainControllerIn){
+    	mainController = mainControllerIn;
         try {
             serverSocket = new ServerSocket(portNo);
         } catch(IOException e){
-            System.out.prinln("Failed creating server socket");
+            System.out.println("Failed creating server socket");
             e.printStackTrace();
         }
 
@@ -21,8 +23,9 @@ public class Server {
             Socket clientSocket = null;
             try {
                 clientSocket = serverSocket.accept();
-                Thread client = new ClentThread(clientSocket);
-                client.start();
+                mainController.newChat(MainView.exampleModel, clientSocket);
+                //Thread client = new ClentThread(clientSocket);
+                //client.start();
             } catch(IOException e){
                 e.printStackTrace();
             }    

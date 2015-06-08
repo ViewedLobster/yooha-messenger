@@ -24,7 +24,7 @@ public class MainView extends JFrame implements ActionListener{
 	static String myClan;
 	
 	//example model
-	MainModel exampleModel = new MainModel("Bosse","haxxerz",666);
+	static MainModel exampleModel = new MainModel("Bosse","haxxerz",666);
 		
 	public MainView(){
 		super("Yooha Messenger!");
