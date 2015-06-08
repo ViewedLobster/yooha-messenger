@@ -67,7 +67,7 @@ public class MainView extends JFrame implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e){
 		if(e.getSource() == connectItem){
-			theMainController.newChat(exampleModel);
+			//theMainController.newChat(exampleModel);
 		}else if(e.getSource() == groupChatItem){
 			
 		}else if(e.getSource() == settingsItem){
