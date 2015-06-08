@@ -9,6 +9,7 @@ public class MainController extends JTabbedPane{
 		public MainController(int listeningPort, MainView mainViewIn){
 			theMainView = mainViewIn;
 			server = new Server(listeningPort,this);
+                        server.start();
 		}
 		
 		public void newChat(MainModel mainModelIn, Socket socketIn){

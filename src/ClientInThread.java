@@ -25,23 +25,18 @@ public class ClientInThread extends Thread {
 
     }
 
-    public void run(){
+    public void run() {
         boolean done = false;
         boolean inMessage = false;
         StringBuilder messageString = new StringBuilder();;
         String inputString = null;
         System.out.println("running client in thread");
+        
         while(!done){
             try {
+                System.out.println("trying to read line");
                 inputString = in.readLine();
-            } catch(Exception e){
-                e.printStackTrace();
-            }
-            if (inputString != null) {
-                
-            System.out.println(inputString);
-            }
-            /*
+            
             if (!inMessage) {
                 // if we are not inside message tags
                 if (inputString.matches("^<message.*")) { 
@@ -70,8 +65,11 @@ public class ClientInThread extends Thread {
                     messageString = new StringBuilder();
                 }
             }
-            */
        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
+}
 }

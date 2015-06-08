@@ -18,7 +18,7 @@ public class Server extends Thread{
     }
 
     public void run(){
-        listen2();
+        listen();
     }
 
     public Server(int portNo){
@@ -33,14 +33,12 @@ public class Server extends Thread{
 
 
 
-
-    
-
     private void listen(){
         while (true) {
             Socket clientSocket = null;
             try {
                 clientSocket = serverSocket.accept();
+                System.out.println("Connection established!");
                 mainController.newChat(MainView.exampleModel, clientSocket);
                 //Thread client = new ClentThread(clientSocket);
                 //client.start();
@@ -68,7 +66,6 @@ public class Server extends Thread{
 
      }
         
-}
 }
 
 

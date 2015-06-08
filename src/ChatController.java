@@ -21,12 +21,13 @@ public class ChatController {
                 clientSocket = socketIn;
 
                 try {
-                    out = new PrintWriter(clientSocket.getOutputStream());
+                    out = new PrintWriter(clientSocket.getOutputStream(), true);
                 } catch(Exception e){
                     e.printStackTrace();
                 }
 
                 clientInThread = new ClientInThread(clientSocket, this);
+                clientInThread.start();
 	}
 	
         // for testing
@@ -40,7 +41,7 @@ public class ChatController {
                 clientSocket = socketIn;
 
                 try {
-                    out = new PrintWriter(clientSocket.getOutputStream());
+                    out = new PrintWriter(clientSocket.getOutputStream(), true);
                 } catch(Exception e){
                     e.printStackTrace();
                 }
@@ -66,7 +67,7 @@ public class ChatController {
             }
 
             try {
-                out = new PrintWriter(clientSocket.getOutputStream());
+                out = new PrintWriter(clientSocket.getOutputStream(), true);
             } catch(Exception e){
                 e.printStackTrace();
             }
@@ -105,12 +106,11 @@ public class ChatController {
 		}
 	}
 	
-        // for testing
 	public void receiveMessage(String messageString){
             try {
                 Message message = parser.parseMessageXML(messageString);
                 System.out.println(MessageDeparser.deparseToHTML(message));
-//                addToPane(MessageDeparser.deparseToHTML(message));
+                addToPane(MessageDeparser.deparseToHTML(message));
             } catch(Exception e){
                 e.printStackTrace();
             }
