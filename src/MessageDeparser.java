@@ -5,7 +5,7 @@ public class MessageDeparser {
 	public MessageDeparser(){
 	}
 	
-	public String deparseMessage(Message message){
+	public static String deparseMessage(Message message){
 		StringBuilder XMLBuilder = new StringBuilder();
 		String textIn = message.getText();
 		
@@ -20,7 +20,7 @@ public class MessageDeparser {
 		return XMLBuilder.toString();
 	}
 	
-	public String cleanUp(String textIn){
+	public static String cleanUp(String textIn){
 		StringBuilder textBuilder = new StringBuilder();
 		
 		for(int i=0; i<textIn.length(); i++){
@@ -44,7 +44,7 @@ public class MessageDeparser {
 		return textBuilder.toString();
 	}
 	
-	public String deparseToHTML(Message message){
+	public static String deparseToHTML(Message message){
 		Calendar calendar = Calendar.getInstance();
 		StringBuilder HTMLBuilder = new StringBuilder();
 		

@@ -62,7 +62,7 @@ public class MainView extends JFrame implements ActionListener{
 		pack();
 		setVisible(true);
 		
-		theMainController.newChat(exampleModel);
+		//theMainController.newChat(exampleModel);
 	}
 	
 	public void actionPerformed(ActionEvent e){

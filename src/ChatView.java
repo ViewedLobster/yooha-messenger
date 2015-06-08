@@ -101,13 +101,22 @@ public class ChatView extends JPanel implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e){
 		if(e.getSource() == closeButton){
-			// stäng tabben
+			// this is bad
+			
 		}else if(e.getSource() == sendButton){
 			theChatController.sendMessage();
-			vertical.setValue(vertical.getMaximum());
 		}else if(e.getSource() == colorChooserButton){
 			colorChosen = JColorChooser.showDialog(null, "Välj färj", colorChosen);
 		}
+	}
+	
+	public void raise(){
+		vertical.setValue(vertical.getMaximum());
+	}
+	
+	public void printToPane(String stringIn){
+		conversationPane.setText(conversationPane.getText()+stringIn);
+		raise();
 	}
 	
 	public String getTextFieldContent(){
