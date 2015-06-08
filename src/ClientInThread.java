@@ -30,17 +30,28 @@ public class ClientInThread extends Thread {
         boolean inMessage = false;
         StringBuilder messageString = new StringBuilder();;
         String inputString = null;
+        System.out.println("running client in thread");
         while(!done){
-            inputString = in.readLine();
+            try {
+                inputString = in.readLine();
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+            if (inputString != null) {
+                
+            System.out.println(inputString);
+            }
+            /*
             if (!inMessage) {
                 // if we are not inside message tags
-                if (inputString.matches("^<message.*")) {
-                    // if find message start tag
+                if (inputString.matches("^<message.*")) { 
+                    System.out.println("Start tag found");                   // if find message start tag
                     messageString.append(inputString);
                     if (inputString.matches(".*</message>$")) {
                         // if we also find end tags in same line
                         inMessage = false;
-                        chatController.recieveMessage(messageString.toString());
+                        System.out.println("End tag found");
+                        chatController.receiveMessage(messageString.toString());
                         messageString = new StringBuilder();
                     } else {
                         // else we are in message
@@ -54,10 +65,12 @@ public class ClientInThread extends Thread {
                 if (inputString.matches(".*</message>$")) {
                     // if we find end tag
                     inMessage = false;
-                    chatController.recieveMessage(messageString.toString());
+                    System.out.println("End tag found");
+                    chatController.receiveMessage(messageString.toString());
                     messageString = new StringBuilder();
                 }
             }
+            */
         }
     }
 

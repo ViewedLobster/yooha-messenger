@@ -24,6 +24,7 @@ public class MessageParser {
     }
 
     public Message parseMessageXML(String XMLString) throws IOException, SAXException{
+        System.out.println("Parsing now!");
         parser.parse(new InputSource(new StringReader(XMLString)), handler);
         return handler.getMessage();
     }
