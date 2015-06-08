@@ -7,6 +7,7 @@ public class ChatController {
 	ChatView theChatView;
         public MessageParser parser;
         public Socket clientSocket;
+        Thread clientInThread;
 	
 	public ChatController(ChatView chatViewIn, Socket socketIn){
 		theChatView = chatViewIn;
@@ -15,6 +16,8 @@ public class ChatController {
                 } catch(Exception e){
                     e.printStackTrace();
                 }
+
+                clientInThread = new ClientInThread(socketIn, this);
 	}
 	
 	public void sendMessage(){
@@ -38,7 +41,11 @@ public class ChatController {
 	}
 	
 	public void receiveMessage(String messageString){
-            Message message = parser.parseMessageXML(messageString);
-            addToPane(MessageDeparser.deparseToHTML(message));
+            try {
+                Message message = parser.parseMessageXML(messageString);
+                addToPane(MessageDeparser.deparseToHTML(message));
+            } catch(Exception e){
+                e.printStackTrace();
+            }
 	}
 }
