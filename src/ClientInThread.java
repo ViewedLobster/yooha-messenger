@@ -40,7 +40,7 @@ public class ClientInThread extends Thread {
                     if (inputString.matches(".*</message>$")) {
                         // if we also find end tags in same line
                         inMessage = false;
-                        chatController.getMessage(messageString.toString());
+                        chatController.recieveMessage(messageString.toString());
                         messageString = new StringBuilder();
                     } else {
                         // else we are in message
@@ -54,7 +54,7 @@ public class ClientInThread extends Thread {
                 if (inputString.matches(".*</message>$")) {
                     // if we find end tag
                     inMessage = false;
-                    chatController.getMessage(messageString.toString());
+                    chatController.recieveMessage(messageString.toString());
                     messageString = new StringBuilder();
                 }
             }

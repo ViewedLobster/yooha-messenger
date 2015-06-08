@@ -5,9 +5,12 @@ import javax.swing.text.*;
 
 public class ChatController {
 	ChatView theChatView;
+        public MessageParser parser;
+        public Socket clientSocket;
 	
-	public ChatController(ChatView chatViewIn){
+	public ChatController(ChatView chatViewIn, Socket socketIn){
 		theChatView = chatViewIn;
+                parser = new MessageParser();
 	}
 	
 	public void sendMessage(){
@@ -30,7 +33,8 @@ public class ChatController {
 		}
 	}
 	
-	public void receiveMessage(){
-		
+	public void receiveMessage(String messageString){
+            Message message = parser.parseMessageXML(messageString);
+            addToPane(MessageDeparser.deparseToHTML(message));
 	}
 }
