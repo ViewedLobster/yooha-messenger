@@ -13,7 +13,7 @@ public class MainController extends JTabbedPane{
 		}
 		
 		public void newChat(MainModel mainModelIn, Socket socketIn){
-			ChatView newChatView = new ChatView(currentIndex,socketIn);
-			this.insertTab(mainModelIn.getNick(), null, newChatView, null, currentIndex++);
+			ChatView newChatView = new ChatView(this ,socketIn);
+			this.addTab(mainModelIn.getNick(), null, newChatView, null);
 		}
 }

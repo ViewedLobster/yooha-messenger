@@ -36,40 +36,53 @@ public class ClientInThread extends Thread {
             try {
                 System.out.println("trying to read line");
                 inputString = in.readLine();
+                if (inputString == null) {
+                    chatController.receiveMessage("<message sender=\"chat_system\"><text color=\"0x000000\">Denne person har stängt chatten</text></message>");
+                    in.close();
+                    chatController.shutdownConnection();
+                    done = true;
+                    continue;
+                }
             
-            if (!inMessage) {
-                // if we are not inside message tags
-                if (inputString.matches("^<message.*")) { 
-                    System.out.println("Start tag found");                   // if find message start tag
+                if (!inMessage) {
+                    // if we are not inside message tags
+                    if (inputString.matches("^<message.*")) { 
+                        System.out.println("Start tag found");                   // if find message start tag
+                        messageString.append(inputString);
+                        if (inputString.matches(".*</message>$")) {
+                            // if we also find end tags in same line
+                            inMessage = false;
+                            System.out.println("End tag found");
+                            chatController.receiveMessage(messageString.toString());
+                            messageString = new StringBuilder();
+                        } else {
+                            // else we are in message
+                            inMessage = true;
+                        }
+                    }
+                } else {
+                    // else we are inside message tags
                     messageString.append(inputString);
+
                     if (inputString.matches(".*</message>$")) {
-                        // if we also find end tags in same line
+                        // if we find end tag
                         inMessage = false;
                         System.out.println("End tag found");
                         chatController.receiveMessage(messageString.toString());
                         messageString = new StringBuilder();
-                    } else {
-                        // else we are in message
-                        inMessage = true;
                     }
                 }
-            } else {
-                // else we are inside message tags
-                messageString.append(inputString);
-                
-                if (inputString.matches(".*</message>$")) {
-                    // if we find end tag
-                    inMessage = false;
-                    System.out.println("End tag found");
-                    chatController.receiveMessage(messageString.toString());
-                    messageString = new StringBuilder();
-                }
             }
-       }
-        catch(Exception e){
-            e.printStackTrace();
+            catch(Exception e){
+                e.printStackTrace();
+                try {
+                    in.close();
+                } catch(IOException e2){
+                    e2.printStackTrace();
+                }
+                done = true;
+            }
         }
-    }
 
-}
+    }
 }

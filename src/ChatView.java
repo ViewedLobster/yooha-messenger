@@ -27,10 +27,10 @@ public class ChatView extends JPanel implements ActionListener{
 	
 	HTMLEditorKit editor;
 	
-	int index;
+        JTabbedPane tabbedPane;
 	
-	public ChatView(int indexIn, Socket socketIn){
-		index = indexIn;
+	public ChatView(JTabbedPane tabbedPaneIn, Socket socketIn){
+		tabbedPane = tabbedPaneIn;
 		
 		theChatController = new ChatController(this,socketIn);
 		colorChosen = Color.BLACK;
@@ -102,7 +102,8 @@ public class ChatView extends JPanel implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e){
 		if(e.getSource() == closeButton){
-			// this is bad
+                    theChatController.shutdownConnection();
+                    tabbedPane.remove(this);
 			
 		}else if(e.getSource() == sendButton){
 			theChatController.sendMessage();

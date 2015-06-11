@@ -116,5 +116,14 @@ public class ChatController {
             }
 	}
 
+        public void shutdownConnection(){
+            out.close();
+            try {
+                clientSocket.close();
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+
 
 }
