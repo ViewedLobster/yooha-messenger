@@ -3,7 +3,7 @@ import javax.swing.text.html.*;
 import java.io.*;
 import javax.swing.text.*;
 
-public class ChatController {
+public class ChatController{
 	ChatView theChatView;
         public MessageParser parser;
         public Socket clientSocket;

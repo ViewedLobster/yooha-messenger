@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.net.*;
+import java.io.*;
 
 public class MainController extends JTabbedPane{
 		MainView theMainView;
@@ -15,5 +16,23 @@ public class MainController extends JTabbedPane{
 		public void newChat(MainModel mainModelIn, Socket socketIn){
 			ChatView newChatView = new ChatView(currentIndex,socketIn);
 			this.insertTab(mainModelIn.getNick(), null, newChatView, null, currentIndex++);
+		}
+		
+		public void connect(String hostAddress, int portNo){
+			Socket clientSocket = null;
+			try{
+				clientSocket = new Socket(hostAddress,portNo);
+			}catch(UnknownHostException e){
+				System.out.println("Host unknown");
+			}catch(IOException e){
+				System.out.println("Failed creating client socket");
+			}
+			this.newChat(MainView.exampleModel,clientSocket);
+		}
+		
+		public void serverRestart(int portNo){
+			server.shutdown();
+			server = new Server(portNo,this);
+			server.start();
 		}
 }

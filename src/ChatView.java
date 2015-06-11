@@ -40,7 +40,7 @@ public class ChatView extends JPanel implements ActionListener{
 		
 		conversationPane = new JEditorPane("text/html",null);
 		conversationPane.setEditable(false);
-		conversationPane.setText("<html><body>LOL</body></html>");
+		//conversationPane.setText("<html><body>LOL</body></html>");
 		editor = (HTMLEditorKit)conversationPane.getEditorKit();
 		
 		scrollPane = new JScrollPane(conversationPane);
@@ -113,7 +113,7 @@ public class ChatView extends JPanel implements ActionListener{
 	}
 	
 	public void raise(){
-		vertical.setValue(vertical.getMaximum());
+		vertical.setValue(vertical.getMinimum());
 	}
 	
 	public String getTextFieldContent(){
