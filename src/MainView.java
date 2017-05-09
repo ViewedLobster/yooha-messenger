@@ -85,6 +85,7 @@ public class MainView extends JFrame implements ActionListener{
 			c.gridx=1;
 			c.gridy=0;
 			c.gridwidth=3;
+                        IPTextField.setText("127.0.0.1");
 			thePanel.add(IPTextField,c);
 			
 			c.gridx=0;

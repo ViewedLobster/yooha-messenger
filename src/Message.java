@@ -4,13 +4,21 @@ public class Message {
     private String messageText;
     private String senderName;
     private Color color;
+    private boolean completeMessage;
 
     public Message(Color colorIn, String textIn, String senderNameIn){
         messageText = textIn;
         senderName = senderNameIn;
         color = colorIn;
+        completeMessage = true;
     }
 
+    public Message(Color colorIn, String textIn, String senderNameIn, boolean cmIn){
+        messageText = textIn;
+        senderName = senderNameIn;
+        color = colorIn;
+        completeMessage = cmIn;
+    }
 
     public String getSenderName(){
         return senderName;
@@ -33,5 +41,8 @@ public class Message {
     }
     private void setColor(Color colorIn){
         color = colorIn;
+    }
+    private void setCompleteMessage(boolean cm){
+        completeMessage = completeMessage;
     }
 }

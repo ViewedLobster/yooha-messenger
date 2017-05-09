@@ -14,88 +14,19 @@ import org.xml.sax.InputSource;
  */
 
 public class MessageParser {
-    SAXParser parser;
-    MessageHandler handler;
+    static SAXParserFactory saxFactory = SAXParserFactory.newInstance();
     
     public MessageParser() throws ParserConfigurationException, SAXException{
-        SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-        parser = parserFactory.newSAXParser();
-        handler = new MessageHandler();
+        saxFactory = SAXParserFactory.newInstance();
     }
 
-    public Message parseMessageXML(String XMLString) throws IOException, SAXException{
+    static public Message parseMessageXML(String XMLString, CipherHandler ch) throws IOException, SAXException, ParserConfigurationException{
         System.out.println("Parsing now!");
+        SAXParser parser = saxFactory.newSAXParser();
+        MessageHandler handler = new MessageHandler(ch);
         parser.parse(new InputSource(new StringReader(XMLString)), handler);
+        handler.buildMessage();
         return handler.getMessage();
     }
 
-
-    private class MessageHandler extends DefaultHandler {
-        private StringBuilder messageText;
-        private String sender;
-        private Color color;
-        private boolean inMessage = false;
-        private Message message = null;
-
-        public MessageHandler(){
-            messageText = new StringBuilder();
-            color = null;
-            sender = "bajs";
-        }
-
-        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-            switch (qName) {
-                case "message":
-                    sender = attributes.getValue("sender");
-                    inMessage = true;
-                    break;
-                case "text":
-                    if (inMessage) {
-                        color = Color.decode(attributes.getValue("color"));
-                    }
-                    break;
-                case "bold":
-                    messageText.append("<b>");
-                    break;
-                case "italics":
-                    messageText.append("<i>");
-                    break;
-            }
-        }
-
-        public void endElement(String uri, String localName, String qName) throws SAXException {
-            switch (qName) {
-                case "message": 
-                    if (inMessage) {
-                        inMessage = false;
-                        buildMessage();
-                    }
-                    break;
-                case "bold":
-                    if (inMessage) {
-                        messageText.append("</b>");
-                    }
-                    break;
-                case "italics":
-                    messageText.append("</i>");
-                    break;
-            }
-        }
-        
-        public void characters(char[] ch, int start, int length) throws SAXException{
-            messageText.append(new String(ch, start, length));
-        }
-
-        public void buildMessage(){
-            message = new Message(color, messageText.toString(), sender);
-            color = null;
-            messageText.delete(0, messageText.length());
-        }
-        
-        public Message getMessage(){
-            Message tempMess = message;
-            message = null;
-            return tempMess;
-        }
-    }
 }

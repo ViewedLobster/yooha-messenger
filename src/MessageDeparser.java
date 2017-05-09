@@ -49,14 +49,14 @@ public class MessageDeparser {
 		StringBuilder HTMLBuilder = new StringBuilder();
 		
 		HTMLBuilder.append("<p>");
-		HTMLBuilder.append(message.getSenderName());
+		HTMLBuilder.append(cleanUp(message.getSenderName()));
 		HTMLBuilder.append(" (");
 		HTMLBuilder.append(calendar.getTime());
 		HTMLBuilder.append("):<br>");
 		HTMLBuilder.append("<font style=\"color:");
 		HTMLBuilder.append(Integer.toHexString(message.getColor().getRGB()).substring(2));
 		HTMLBuilder.append("\">");
-		HTMLBuilder.append(message.getText());
+		HTMLBuilder.append(cleanUp(message.getText()));
 		HTMLBuilder.append("</font></p>");
 		
 		return HTMLBuilder.toString();

@@ -9,6 +9,7 @@ public class ChatController{
         public Socket clientSocket;
         Thread clientInThread;
         PrintWriter out;
+        CipherHandler cipherHandler;
 	
 	public ChatController(ChatView chatViewIn, Socket socketIn){
 		theChatView = chatViewIn;
@@ -81,6 +82,7 @@ public class ChatController{
 		if (!(textFieldContent == "")){
 			Message messageOut = new Message(theChatView.getColor(),textFieldContent,MainView.getNick());
 			String XMLString = MessageDeparser.deparseMessage(messageOut);
+			System.out.println(XMLString);
 			addToPane(MessageDeparser.deparseToHTML(messageOut));
                         out.println(XMLString);
 
@@ -109,7 +111,7 @@ public class ChatController{
 	public void receiveMessage(String messageString){
             try {
                 Message message = parser.parseMessageXML(messageString);
-                System.out.println(MessageDeparser.deparseToHTML(message));
+//System.out.println(MessageDeparser.deparseToHTML(message));
                 addToPane(MessageDeparser.deparseToHTML(message));
             } catch(Exception e){
                 e.printStackTrace();
