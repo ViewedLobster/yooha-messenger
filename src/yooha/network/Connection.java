@@ -49,6 +49,7 @@ public class Connection implements Runnable {
             else
             {
                 shutdown();
+                done = true;
             }
         }
     }
@@ -56,6 +57,11 @@ public class Connection implements Runnable {
     private void receiveMessage(String messageString) {
         // TODO Auto-generated method stub
 
+    }
+
+    public void sendString( String s )
+    {
+        out.println(s);
     }
 
     public void shutdown()

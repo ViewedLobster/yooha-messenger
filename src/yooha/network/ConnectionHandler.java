@@ -16,10 +16,17 @@ public class ConnectionHandler
         connections = new ArrayList<Connection>();
     }
 
-    public void addConnection( Connection conn )
+    public synchronized void addConnection( Connection conn )
     {
         connections.add(conn);
     }
     
+
+    public synchronized void sendString(String s)
+    {
+        for( Connection conn : connections )
+            conn.sendString(s);
+    }
+
 
 }
