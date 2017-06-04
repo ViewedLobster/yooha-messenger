@@ -7,26 +7,46 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import yooha.MessageStringHandler;
+
 public class Connection implements Runnable {
 
     public Socket socket;
     public InputStream in;
     public PrintWriter out;
     private Scanner inputScanner;
-    public int chat_id;
+    public int connectionId;
+    private MessageStringHandler messageHandler;
 
     public int horizon = 16384;
 
     private final Pattern messagePattern = Pattern.compile("<\\s*message.*>.*</message>");
 
-    public Connection ( Socket socket, int chat_id ) throws IOException
+    public Connection ( Socket socket, int connectionId, MessageStringHandler mh ) throws IOException
     {
         this.socket = socket;
-        this.chat_id = chat_id;
+        this.connectionId = connectionId;
+        this.messageHandler = mh;
+
+        in = socket.getInputStream();
+        inputScanner = new Scanner(in, "utf-8");
+        out = new PrintWriter ( this.socket.getOutputStream());
+    }
+
+    public Connection ( Socket socket, int connectionId) throws IOException
+    {
+        this.socket = socket;
+        this.connectionId = connectionId;
+        this.messageHandler = null;
 
         in = socket.getInputStream();
         inputScanner = new Scanner(in, "utf-8");
         out = new PrintWriter ( this.socket.getOutputStream() );
+    }
+
+    public void setMessageHandler( MessageStringHandler mh )
+    {
+        this.messageHandler = mh;
     }
 
     public void run()
@@ -44,6 +64,7 @@ public class Connection implements Runnable {
 
             if (messageString != null)
             {
+                System.out.println(messageString);
                 receiveMessage(messageString);
             }
             else
@@ -55,13 +76,15 @@ public class Connection implements Runnable {
     }
 
     private void receiveMessage(String messageString) {
-        // TODO Auto-generated method stub
+        this.messageHandler.handleMessageString(messageString, this);
 
     }
 
-    public void sendString( String s )
+    public void sendString(String s )
     {
+        System.out.println("Sending string: "+s);
         out.println(s);
+        out.flush();
     }
 
     public void shutdown()

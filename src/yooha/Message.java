@@ -1,24 +1,18 @@
 package yooha;
 import java.awt.Color;
+import java.lang.StringBuilder;
 
 public class Message {
-    private String messageText;
-    private String senderName;
-    private Color color;
-    private boolean completeMessage;
+    public final String messageText;
+    public final String senderName;
+    public final Color color;
+    public final boolean disconnect;
 
-    public Message(Color colorIn, String textIn, String senderNameIn){
-        messageText = textIn;
-        senderName = senderNameIn;
-        color = colorIn;
-        completeMessage = true;
-    }
-
-    public Message(Color colorIn, String textIn, String senderNameIn, boolean cmIn){
-        messageText = textIn;
-        senderName = senderNameIn;
-        color = colorIn;
-        completeMessage = cmIn;
+    public Message(String senderNameIn, String textIn, Color colorIn, boolean disconnect){
+        this.messageText = textIn;
+        this.senderName = senderNameIn;
+        this.color = colorIn;
+        this.disconnect = disconnect;
     }
 
     public String getSenderName(){
@@ -32,18 +26,30 @@ public class Message {
     public Color getColor(){
         return color;
     }
-    
-    private void setMessageText(String messageTextIn){
-        messageText = messageTextIn;
-    }
 
-    private void setSenderName(String senderNameIn){
-        senderName = senderNameIn;
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Sender: ");
+        if (senderName != null)
+            sb.append(senderName + "\n");
+        else
+            sb.append("null\n");
+
+        sb.append("Disconnect: " + disconnect + "\n");
+        sb.append("Color: ");
+        if (color != null)
+            sb.append(color.toString()+"\n");
+        else
+            sb.append("null\n");
+
+        sb.append("Message text:\n");
+        if (messageText != null)
+            sb.append(messageText);
+        else
+            sb.append("null");
+
+        return sb.toString();
     }
-    private void setColor(Color colorIn){
-        color = colorIn;
-    }
-    private void setCompleteMessage(boolean cm){
-        completeMessage = completeMessage;
-    }
+    
 }
