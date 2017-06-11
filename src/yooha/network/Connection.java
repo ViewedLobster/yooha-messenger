@@ -73,11 +73,11 @@ public class Connection implements Runnable {
                 done = true;
             }
         }
+        System.err.println("Connection thread ended!");
     }
 
     private void receiveMessage(String messageString) {
         this.messageHandler.handleMessageString(messageString, this);
-
     }
 
     public void sendString(String s )
@@ -89,8 +89,15 @@ public class Connection implements Runnable {
 
     public void shutdown()
     {
-        inputScanner.close();
-        out.close();
+        System.err.println("Shutting down connection "+connectionId);
+        try{
+            in.close();
+            out.close();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
 

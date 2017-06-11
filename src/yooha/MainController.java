@@ -31,14 +31,35 @@ public class MainController extends JTabbedPane
         return currentChatIndex++;
     }
 
-    public void addConnection(String requestText, Connection conn)
+    public void addConnection(Message message, Connection conn)
     {
-        // TODO
-        // Show some dialogue that lets you choose where to add conn
         
-        ServerBackend sb = new ServerBackend(conn, getFreeChatId());
+        int chat_id = AddToChatHelper.whatChat(chats, message);
+        if (chat_id == -1)
+        {
+            // -1 means create new chat
+            ServerBackend sb = new ServerBackend(conn, message.senderName, getFreeChatId());
 
-        newChat(MainView.exampleModel, sb);
+            newChat(MainView.exampleModel, sb);
+        }
+        else if(chat_id == -2)
+        {
+            // -2 means reject connection
+            String xmlReject = message.request ? MessageDeparser.getRequestRejection() : MessageDeparser.getSimpleRejection();
+            conn.sendString(xmlReject);
+            conn.shutdown();
+        }
+        else
+        {
+            for (Chat c : chats )
+            {
+                if ( c.chatBackend.chat_id == chat_id && c.server )
+                {
+                    ((ServerBackend) c.chatBackend).addConnection(conn, message.senderName);
+                    break;
+                }
+            }
+        }
 
     }
 
@@ -48,6 +69,7 @@ public class MainController extends JTabbedPane
             System.out.println("Connecting...");
             Socket s = new Socket(host, port);
             Connection conn = new Connection( s, Connecter.getFreeConnectionId() );
+            conn.sendString(MessageDeparser.getRequestString(MainView.getNick()));
             (new Thread(conn)).start();
             ClientBackend cb = new ClientBackend(conn, getFreeChatId());
 
@@ -66,7 +88,7 @@ public class MainController extends JTabbedPane
         Chat c = new Chat(this, cb);
         chats.add(c);
 
-        this.addTab("Chat", null, c, null);
+        this.addTab("Chat "+cb.chat_id, null, c, null);
     }
 }
 

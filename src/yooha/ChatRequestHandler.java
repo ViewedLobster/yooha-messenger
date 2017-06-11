@@ -28,10 +28,10 @@ public class ChatRequestHandler implements MessageStringHandler
 
     public void handleMessageString( String messageString, Connection conn )
     {
-        Message m = MessageParser.parseString(messageString);
+        Message m = MessageParser.parseString(messageString, null);
         System.out.println(m);
 
-        controller.addConnection(m.getText(), conn);
+        controller.addConnection(m, conn);
     }
 
 }

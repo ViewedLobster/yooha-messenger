@@ -1,9 +1,13 @@
 package yooha;
 
 import yooha.ChatBackend;
+import yooha.cipher.CipherHandler;
+import yooha.cipher.Ciphers;
+import yooha.network.FileReceiver;
 
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.JScrollBar;
@@ -14,23 +18,34 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.JColorChooser;
 import javax.swing.text.Document;
 
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.JOptionPane;
+import javax.swing.JComboBox;
+import javax.swing.JCheckBox;
+
 import java.awt.GridBagConstraints;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
 
 import java.io.StringReader;
+import java.io.File;
 
 
-public class Chat extends JPanel implements ActionListener{
+public class Chat extends JPanel implements ActionListener, ItemListener{
 
     JButton colorChooserButton;
     JButton sendButton;
     JButton sendFileButton;
     JButton encryptButton;
+    JButton userButton;
     JButton closeButton;
+    JCheckBox encryptCheckBox;
 
     JEditorPane conversationPane;
     JTextArea typingPane;
@@ -42,10 +57,11 @@ public class Chat extends JPanel implements ActionListener{
     JTabbedPane tabbedPane;
 
     ChatBackend chatBackend;
+    public boolean server = false;
 
     public Chat(JTabbedPane tabbedPaneIn, ChatBackend chatBackend){
-        this.chatBackend = chatBackend;
-        this.chatBackend.setChat(this);
+        this.chatBackend = chatBackend; this.chatBackend.setChat(this);
+        this.server = this.chatBackend instanceof ServerBackend;
 
         tabbedPane = tabbedPaneIn;
         colorChosen = Color.BLACK;
@@ -96,6 +112,16 @@ public class Chat extends JPanel implements ActionListener{
         c.fill=GridBagConstraints.HORIZONTAL;
         add(encryptButton, c);
 
+        userButton = new JButton("Användare");
+        userButton.addActionListener(this);
+        userButton.setEnabled(this.server);
+        c.gridx=3;
+        c.gridy=3;
+        c.gridwidth=1;
+        c.gridheight=1;
+        c.fill=GridBagConstraints.HORIZONTAL;
+        add(userButton, c);
+
         closeButton = new JButton("Stäng");
         closeButton.addActionListener(this);
         c.gridx=4;
@@ -119,14 +145,25 @@ public class Chat extends JPanel implements ActionListener{
         c.gridx=4;
         c.gridy=4;
         c.gridwidth=1;
-        c.gridheight=2;
+        c.gridheight=1;
         c.fill = GridBagConstraints.BOTH;
         add(sendButton,c);
+
+        encryptCheckBox = new JCheckBox("Kryptera");
+        encryptCheckBox.setSelected(false);
+        encryptCheckBox.addItemListener(this);
+        c.gridx=4;
+        c.gridy=5;
+        c.gridwidth=1;
+        c.gridheight=1;
+        c.fill = GridBagConstraints.BOTH;
+        add(encryptCheckBox,c);
     }
 
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == closeButton)
         {
+            this.chatBackend.sendDisconnect();
             this.chatBackend.shutdown();
             tabbedPane.remove(this);
 
@@ -144,9 +181,36 @@ public class Chat extends JPanel implements ActionListener{
         {
              setNewCipherHandler();
         }
+        else if (e.getSource() == userButton )
+        {
+            removeUser();
+        }
+        else if (e.getSource() == sendFileButton )
+        {
+            sendFile();
+        }
         
     }
-    
+
+    public void sendFile()
+    {
+        JFileChooser fc = new JFileChooser();
+
+        int res = fc.showOpenDialog(this);
+
+        if ( res == JFileChooser.APPROVE_OPTION)
+        {
+            File f = fc.getSelectedFile();
+            if (f.exists())
+                chatBackend.sendFileRequest(f);
+        }
+    }
+
+    public void itemStateChanged( ItemEvent ie )
+    {
+        if ( ie.getSource() == encryptCheckBox )
+            chatBackend.enableEncryption( ie.getStateChange() == ItemEvent.SELECTED );
+    }
     private void sendMessage()
     {
         String textFieldContent = this.getTextFieldContent();
@@ -155,25 +219,18 @@ public class Chat extends JPanel implements ActionListener{
             Color c = getColor();
             Message m = new Message(MainView.getNick(), textFieldContent, c, false);
             this.chatBackend.sendMessage(m);
+            showMessage(m);
         }
     }
 
-    public void showDisconnect( Message m )
-    {
-        Message disc = new Message("chat_system", "This user has disconnected: " + m.senderName, Color.RED, m.disconnect);
-        addToPane(MessageDeparser.deparseToHTML(disc));
-    }
+    //public void showDisconnect( Message m )
+    //{
+    //    Message disc = new Message("chat_system", "This user has disconnected: " + m.senderName, Color.RED, m.disconnect);
+    //    addToPane(MessageDeparser.deparseToHTML(disc));
+    //}
     public void showMessage(Message m )
     {
-        if (m.disconnect)
-        {
-            showDisconnect(m);
-        }
-        else
-        {
-            addToPane(MessageDeparser.deparseToHTML(m));
-        }
-        
+        addToPane(MessageDeparser.deparseToHTML(m));
     }
 
     public void addToPane(String HTMLString){
@@ -190,7 +247,6 @@ public class Chat extends JPanel implements ActionListener{
     private void setNewCipherHandler()
     {
 
-        /*
         JPanel uiPanel = new JPanel();
         uiPanel.setLayout( new GridBagLayout() );
         GridBagConstraints c = new GridBagConstraints();
@@ -211,10 +267,9 @@ public class Chat extends JPanel implements ActionListener{
         c.gridy=1;
         c.gridwidth=2;
         c.gridheight=1;
-        String[] cipherNames = CipherHandler.CIPHER_NAMES.clone();
-        cipherNames[1] = cipherNames[CipherHandler.CIPHER_ENUM_CAESAR].concat(" (rekommenderas)");
+        String[] cipherNames = CipherHandler.cipherStrings.clone();
         JComboBox cipherList = new JComboBox(cipherNames);
-        cipherList.setSelectedIndex(CipherHandler.CIPHER_ENUM_CAESAR);
+        cipherList.setSelectedIndex(Ciphers.AES.ordinal());
         uiPanel.add(cipherList,c);
 
         c.gridx=0;
@@ -232,28 +287,22 @@ public class Chat extends JPanel implements ActionListener{
         
         int result = JOptionPane.showConfirmDialog(null, uiPanel, "Skifferval och inställning", JOptionPane.OK_CANCEL_OPTION);
 
-        CipherHandler ch;
-
         if (result == 0) { // the user has clicked OK
-            try {
-                ch = new CipherHandler(cipherList.getSelectedIndex(), keyField.getText());
-            }
-            catch(CipherKeyInputWrongException e)
+            String type = CipherHandler.cipherStrings[cipherList.getSelectedIndex()];
+            String keyString = keyField.getText();
+
+            if ("".equals(keyString) )
             {
-                e.printStackTrace();
-                ch = null;
+                chatBackend.setPreferredCipher( type );
             }
-            
+            else
+            {
+                chatBackend.overrideCipher( type, keyString );
+            }
         } else {
-            ch = null;
+            // do nothing
         }
 
-        if (ch != null){
-            theChatController.cipherHandler = ch;
-        }
-
-        */
-            
     }
 
     public void raise(){
@@ -269,5 +318,19 @@ public class Chat extends JPanel implements ActionListener{
     public Color getColor(){
         return colorChosen;
     }
+
+    public void removeUser () 
+    {
+        if ( this.server )
+        {
+            int id = AddToChatHelper.removeUserQuery( ((ServerBackend)chatBackend).getConnectionData() );
+
+            if (id >= 0)
+                ((ServerBackend)chatBackend).removeAndShutdownConnection(id);
+        }
+    }
+
+    
+
 
 }

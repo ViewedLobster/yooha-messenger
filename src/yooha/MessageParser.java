@@ -1,5 +1,7 @@
 package yooha;
 
+import yooha.cipher.CipherHandler;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.OutputKeys;
@@ -23,10 +25,14 @@ public class MessageParser
 {
     private static DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
-    public static final String[] knownTags = {"message",
-                                               "text",
+    public static final String[] knownTags = {"message", "text",
                                                "disconnect",
-                                               //"request"
+                                               "request",
+                                               "keyrequest",
+                                               "encrypted",
+                                               "decrypted",
+                                               "filerequest",
+                                               "fileresponse"
                                                 };
 
     public static boolean allowedTagName( String tagName )
@@ -43,7 +49,7 @@ public class MessageParser
 
     public static Element removeUnknown(Element root)
     {
-        if ( root.getTagName() != "message" )
+        if ( !allowedTagName(root.getTagName()) )
         {
             return null;
         }
@@ -107,7 +113,25 @@ public class MessageParser
 
     }
 
-    public static Message parseString( String s )
+    public static Element parseElementString( String s )
+    {
+        try
+        {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            ByteArrayInputStream bs = new ByteArrayInputStream( s.getBytes("UTF-8") );
+            Document doc = builder.parse(bs);
+
+            Element root = doc.getDocumentElement();
+            return root;
+        }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Message parseString( String s, CipherHandler ch )
     {
 
         try{
@@ -119,8 +143,21 @@ public class MessageParser
             // The fields to be filled with data
             String sender;
             boolean disconnect = false;
+            boolean request = false;
+            boolean requestDenied = false;
             String messageText;
+            String requestText;
             Color textColor;
+            boolean keyRequest = false;
+            String keyType = null;
+            String key = null;
+            String keyReply = null;
+            boolean fileRequest = false;
+            String fileRequestFileName = null;
+            int fileRequestFileSize = -1;
+            boolean fileResponse = false;
+            boolean fileResponseReply = false;
+            int fileResponsePort = -1;
 
             // Get root an remove unknown elements from doc tree
             Element root = doc.getDocumentElement();
@@ -130,11 +167,85 @@ public class MessageParser
                 return null;
             }
             sender = root.getAttribute("sender");
+
             
-            NodeList nl = root.getElementsByTagName("disconnect");
+            NodeList nl = root.getElementsByTagName("encrypted");
+            if ( nl.getLength() > 0 )
+            {
+                Element e = (Element)nl.item(0);
+                String type = e.getAttribute("type");
+
+                if ( ch != null && ch.type.equals(type) )
+                {
+                    // If we have a cipher handler and it matches the type we decrypt and
+                    // replace the "encrypted" element by our decrypted element
+                    String ciphertext = e.getTextContent();
+                    String plaintext = ch.decryptText(ciphertext);
+
+                    plaintext = "<decrypted type=\"" + ch.type + "\">" + 
+                                plaintext + "</decrypted>";
+                    Element decrypted = parseElementString(plaintext);
+                    decrypted = (Element)doc.importNode(decrypted, true);
+                    e.getParentNode().replaceChild( removeUnknown(decrypted), e );
+                }
+
+            }
+            
+            nl = root.getElementsByTagName("disconnect");
             if (nl.getLength() > 0)
             {
                 disconnect = true;
+            }
+            
+            nl = root.getElementsByTagName("request");
+            if (nl.getLength() > 0)
+            {
+                request = true;
+                Element e = (Element)nl.item(0);
+
+                requestText = e.getTextContent();
+
+                requestDenied = e.getAttribute("reply").equals("no");
+            }
+            else
+            {
+                requestText = null;
+            }
+
+            nl = root.getElementsByTagName("keyrequest");
+            if ( nl.getLength() > 0 )
+            {
+                keyRequest = true;
+                Element e = (Element)nl.item(0);
+
+                String tmp = e.getAttribute("type");
+                if (!tmp.equals(""))
+                    keyType = tmp;
+
+                tmp = e.getAttribute("key");
+                if ( !tmp.equals("") )
+                    key = tmp;
+                tmp = e.getAttribute("reply");
+                if (!tmp.equals(""))
+                    keyReply = tmp;
+            }
+
+            nl = root.getElementsByTagName("filerequest");
+            if (nl.getLength() > 0 )
+            {
+                fileRequest = true;
+                Element e = (Element)nl.item(0);
+                fileRequestFileName = e.getAttribute("name");
+                fileRequestFileSize = Integer.parseInt(e.getAttribute("size"));
+            }
+
+            nl = root.getElementsByTagName("fileresponse");
+            if (nl.getLength() > 0)
+            {
+                fileResponse = true;
+                Element e = (Element)nl.item(0);
+                fileResponseReply = "yes".equals(e.getAttribute("reply"));
+                fileResponsePort = Integer.parseInt(e.getAttribute("port"));
             }
 
             nl = root.getElementsByTagName("text");
@@ -158,7 +269,24 @@ public class MessageParser
                 messageText = null;
             }
 
-            return new Message(sender, messageText, textColor, disconnect);
+            return new Message( sender,
+                                messageText,
+                                textColor,
+                                disconnect,
+                                request, 
+                                requestText, 
+                                requestDenied, 
+                                keyRequest, 
+                                keyType, 
+                                key, 
+                                keyReply,
+                                fileRequest,
+                                fileRequestFileName,
+                                fileRequestFileSize,
+                                fileResponse,
+                                fileResponseReply,
+                                fileResponsePort
+                                );
 
             /*
             NodeList nl = doc.getElementsByTagName("message");
@@ -184,8 +312,15 @@ public class MessageParser
 
     public static void main(String[] args) {
         String s = "<message sender=\"rolf\"><disconnect /> <text> this is some text <tag1> in tags </tag1> second line </text> </message>";
-        Message m = parseString(s);
-        System.out.println(m);
-        System.out.println(s);
+    }
+
+    public static Message getDisconnectMessage( String nick )
+    {
+        return new Message(nick, "User disconnected.", Color.RED, true );
+    }
+
+    public static Message getRequestDeniedMessage( String nick )
+    {
+        return new Message("chat_system", "Server did not accept your connection.", Color.RED, false );
     }
 }
