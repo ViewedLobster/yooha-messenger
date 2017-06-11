@@ -54,16 +54,16 @@ public class Chat extends JPanel implements ActionListener, ItemListener{
     Color colorChosen;
     JScrollBar vertical;
     HTMLEditorKit editor;
-    JTabbedPane tabbedPane;
+    MainController mainController;
 
     ChatBackend chatBackend;
     public boolean server = false;
 
-    public Chat(JTabbedPane tabbedPaneIn, ChatBackend chatBackend){
+    public Chat(MainController mainControllerIn, ChatBackend chatBackend){
         this.chatBackend = chatBackend; this.chatBackend.setChat(this);
         this.server = this.chatBackend instanceof ServerBackend;
 
-        tabbedPane = tabbedPaneIn;
+        mainController = mainControllerIn;
         colorChosen = Color.BLACK;
 
         setLayout(new GridBagLayout());
@@ -165,7 +165,9 @@ public class Chat extends JPanel implements ActionListener, ItemListener{
         {
             this.chatBackend.sendDisconnect();
             this.chatBackend.shutdown();
-            tabbedPane.remove(this);
+            mainController.remove(this);
+            mainController.removeChat(this);
+
 
         }
         else if(e.getSource() == sendButton)
@@ -202,7 +204,7 @@ public class Chat extends JPanel implements ActionListener, ItemListener{
         {
             File f = fc.getSelectedFile();
             if (f.exists())
-                chatBackend.sendFileRequest(f);
+                chatBackend.sendFileRequest(f, getTextFieldContent());
         }
     }
 
@@ -331,6 +333,10 @@ public class Chat extends JPanel implements ActionListener, ItemListener{
     }
 
     
-
+    public void shutdown()
+    {
+        chatBackend.sendDisconnect();
+        chatBackend.shutdown();
+    }
 
 }

@@ -1,11 +1,15 @@
 package yooha;
 
 import yooha.network.*;
+
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -19,7 +23,8 @@ class FRHandler implements Runnable
         Connection conn;
         ConnectionData connData;
         Chat chat;
-        FRHandler ( Connection conn, ConnectionData connData, String nick, String filename, int filesize, Chat chat )
+        String text;
+        FRHandler ( Connection conn, ConnectionData connData, String nick, String filename, int filesize, Chat chat, String text)
         {
             this.conn = conn;
             this.connData = connData;
@@ -27,6 +32,7 @@ class FRHandler implements Runnable
             this.filesize = filesize;
             this.nick = nick;
             this.chat = chat;
+            this.text = text;
         }
 
         public void run()
@@ -44,11 +50,19 @@ class FRHandler implements Runnable
             c.gridy = 1;
             uiPanel.add(new JLabel(filename + " (" + filesize + " bytes)"), c);
 
-
             c.gridy = 2;
+            JTextArea textField = new JTextArea();
+            textField.setPreferredSize(new Dimension(400, 100));
+            textField.setEnabled(false);
+            textField.setLineWrap(true);
+            textField.setText(text);
+            textField.setDisabledTextColor(Color.BLACK);
+            uiPanel.add(textField, c);
+
+            c.gridy = 3;
             uiPanel.add(new JLabel("Skriv ditt meddelande:"), c);
 
-            c.gridy = 2;
+            c.gridy = 4;
             JTextField messageField = new JTextField();
             messageField.setPreferredSize(new Dimension(400, 25));
             uiPanel.add(messageField, c);

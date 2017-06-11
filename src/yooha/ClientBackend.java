@@ -48,6 +48,7 @@ public class ClientBackend extends ChatBackend implements MessageStringHandler
 
     public void shutdown()
     {
+        conn.sendString(MessageDeparser.getDisconnectXml("chat_system"));
         conn.shutdown();
     }
 
@@ -188,9 +189,9 @@ public class ClientBackend extends ChatBackend implements MessageStringHandler
 
     }
 
-    public synchronized void sendFileRequest(File f)
+    public synchronized void sendFileRequest(File f, String text)
     {
-        String xmlString = MessageDeparser.getFileRequestString(MainView.getNick(), f );
+        String xmlString = MessageDeparser.getFileRequestString(MainView.getNick(), f, text );
         filesendtimestamp = (new Date()).getTime();
         fileToSend = f;
 
@@ -199,7 +200,7 @@ public class ClientBackend extends ChatBackend implements MessageStringHandler
 
     public void handleFileRequest ( Message m, Connection conn )
     {
-        (new Thread(new FRHandler(conn, connectionData, m.senderName, m.fileRequestFileName, m.fileRequestFileSize, chat))).start();
+        (new Thread(new FRHandler(conn, connectionData, m.senderName, m.fileRequestFileName, m.fileRequestFileSize, chat, m.getText() ))).start();
     }
 
     public void handleFileResponse ( Message m, Connection conn )

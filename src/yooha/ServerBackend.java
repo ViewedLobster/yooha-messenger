@@ -393,16 +393,36 @@ public class ServerBackend extends ChatBackend implements MessageStringHandler
         }
     }
 
-    public synchronized void sendFileRequest(File f)
+    public synchronized void sendFileRequest(File f, String text)
     {
-        String xmlString = MessageDeparser.getFileRequestString(MainView.getNick(), f );
-        filesendtimestamp = (new Date()).getTime();
-        fileToSend = f;
+        String xmlString = MessageDeparser.getFileRequestString(MainView.getNick(), f, text );
 
+        if (connections.size() > 1){
+        int id = AddToChatHelper.whatUser( getConnDatas() );
+        if ( id >= 0 )
+        {
+            ConnectionData connData = getConnData( id );
+
+            connData.filesendtimestamp = (new Date()).getTime();
+            connData.fileToSend = f;
+        }
+
+        getConnection(id).sendString(xmlString);
+        }
+        else
+        {
+            connections.get(0).sendString(xmlString);
+        }
+    }
+
+    public synchronized Connection getConnection( int connectionid )
+    {
         for ( Connection conn : connections )
         {
-            conn.sendString(xmlString);
+            if ( conn.connectionId == connectionid )
+                return conn;
         }
+        return null;
     }
 
     public void handleFileRequest ( Message m, Connection conn )
@@ -414,7 +434,7 @@ public class ServerBackend extends ChatBackend implements MessageStringHandler
         }
         else
         {
-            (new Thread(new FRHandler(conn, getConnData(conn), m.senderName, m.fileRequestFileName, m.fileRequestFileSize, chat))).start();
+            (new Thread(new FRHandler(conn, getConnData(conn), m.senderName, m.fileRequestFileName, m.fileRequestFileSize, chat, m.getText() ))).start();
         }
 
     }
@@ -422,7 +442,15 @@ public class ServerBackend extends ChatBackend implements MessageStringHandler
     public void handleFileResponse ( Message m, Connection conn )
     {
         if ( m.fileResponseReply )
-            (new Thread(new FileSender(conn.socket.getInetAddress(), m.fileResponsePort, this.fileToSend, getConnData(conn).outCipherHandler ))).start();
+        {
+            ConnectionData connData = getConnData(conn);
+            if (connData.hasSentFileRequest())
+            {
+                (new Thread(new FileSender(conn.socket.getInetAddress(), m.fileResponsePort, connData.fileToSend, connData.outCipherHandler ))).start();
+                connData.fileToSend = null;
+            }
+
+        }
             
         if (m.messageText != null && !"".equals(m.messageText))
             chat.showMessage(m);

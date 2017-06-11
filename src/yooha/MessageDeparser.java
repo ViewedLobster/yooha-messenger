@@ -140,7 +140,7 @@ public class MessageDeparser {
             return sb.toString();
         }
 
-        public static String getFileRequestString( String nick, File f )
+        public static String getFileRequestString( String nick, File f, String text )
         {
             if ( f.length() > Integer.MAX_VALUE )
                 return null;
@@ -151,7 +151,9 @@ public class MessageDeparser {
             sb.append( f.getName() );
             sb.append( "\" size=\"");
             sb.append(f.length());
-            sb.append("\"></filerequest></message>");
+            sb.append("\"><text color=\"#000000\">");
+            sb.append(text);
+            sb.append("</text></filerequest></message>");
             return sb.toString();
 
         }

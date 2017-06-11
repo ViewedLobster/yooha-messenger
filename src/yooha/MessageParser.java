@@ -32,7 +32,9 @@ public class MessageParser
                                                "encrypted",
                                                "decrypted",
                                                "filerequest",
-                                               "fileresponse"
+                                               "fileresponse",
+                                               "kursiv",
+                                               "fetstil"
                                                 };
 
     public static boolean allowedTagName( String tagName )

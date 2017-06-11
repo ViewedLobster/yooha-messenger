@@ -3,6 +3,7 @@ package yooha;
 import yooha.cipher.CipherHandler;
 
 import java.util.Date;
+import java.io.File;
 
 public class ConnectionData
 {
@@ -15,6 +16,8 @@ public class ConnectionData
     public String keyRequestKey;
     public CipherHandler outCipherHandler;
     public CipherHandler inCipherHandler;
+    public long filesendtimestamp;
+    public File fileToSend;
     
 
     public ConnectionData ( String nick, String clan, int connectionId )
@@ -38,6 +41,15 @@ public class ConnectionData
     {
         Date d = new Date();
         if ( type.equals( keyRequestType ) && d.getTime() - 60000 <= keyRequestTimeMillis && keyRequestTimeMillis >= 0 )
+        {
+            return true;
+        }
+        else return false;
+    }
+    public boolean hasSentFileRequest ()
+    {
+        Date d = new Date();
+        if ( fileToSend != null && d.getTime() - 60000 <= keyRequestTimeMillis && keyRequestTimeMillis >= 0 )
         {
             return true;
         }

@@ -86,9 +86,28 @@ public class MainController extends JTabbedPane
     public void newChat(MainModel mainModel, ChatBackend cb )
     {
         Chat c = new Chat(this, cb);
-        chats.add(c);
+        synchronized(chats){
+            chats.add(c);
+        }
 
         this.addTab("Chat "+cb.chat_id, null, c, null);
+    }
+
+    public void shutdown()
+    {
+        for ( Chat c : chats )
+        {
+            c.shutdown();
+        }
+        System.exit(0);
+    }
+
+    public void removeChat( Chat c )
+    {
+        synchronized(chats)
+        {
+            chats.remove(c);
+        }
     }
 }
 

@@ -21,7 +21,7 @@ public abstract class ChatBackend
     public abstract void sendDisconnect();
     public abstract void setPreferredCipher(String type);
     public abstract void overrideCipher( String type, String keyString );
-    public abstract void sendFileRequest( File f );
+    public abstract void sendFileRequest( File f, String text );
 
     public abstract List<ConnectionData> getConnectionData();
 
