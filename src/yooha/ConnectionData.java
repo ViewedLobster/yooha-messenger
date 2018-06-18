@@ -49,7 +49,7 @@ public class ConnectionData
     public boolean hasSentFileRequest ()
     {
         Date d = new Date();
-        if ( fileToSend != null && d.getTime() - 60000 <= keyRequestTimeMillis && keyRequestTimeMillis >= 0 )
+        if ( fileToSend != null && d.getTime() - 60000 <= filesendtimestamp && filesendtimestamp >= 0 )
         {
             return true;
         }

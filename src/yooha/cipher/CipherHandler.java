@@ -22,7 +22,7 @@ public abstract class CipherHandler
     public abstract CipherHandlerCipher getCHCipher();
     public abstract CipherHandlerCipher getCHCipher(InputStream in, boolean encryption);
 
-    public static final String[] cipherStrings = { "caesar", "AES", "TT"};
+    public static final String[] cipherStrings = { "caesar", "AES" };
 
     public static boolean supportedCipher( String type )
     {

@@ -6,7 +6,7 @@ public class TruthTellerHandler extends CipherHandler
 
     public TruthTellerHandler()
     {
-        super("tt");
+        super("tt", 1);
     }
 
     public String encryptText(String s)

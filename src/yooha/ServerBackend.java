@@ -396,23 +396,22 @@ public class ServerBackend extends ChatBackend implements MessageStringHandler
     public synchronized void sendFileRequest(File f, String text)
     {
         String xmlString = MessageDeparser.getFileRequestString(MainView.getNick(), f, text );
-
+        int id;
         if (connections.size() > 1){
-        int id = AddToChatHelper.whatUser( getConnDatas() );
-        if ( id >= 0 )
-        {
-            ConnectionData connData = getConnData( id );
+        	int chosen = AddToChatHelper.whatUser( getConnDatas() );
+        	if ( chosen >= 0 )
+        	{
+        		id = chosen;
+        	} else return; // DO nothing if choice faulty
+        } else id = 0;
+        ConnectionData connData = getConnData( id );
 
-            connData.filesendtimestamp = (new Date()).getTime();
-            connData.fileToSend = f;
-        }
+        connData.filesendtimestamp = (new Date()).getTime();
+        connData.fileToSend = f;
+
 
         getConnection(id).sendString(xmlString);
-        }
-        else
-        {
-            connections.get(0).sendString(xmlString);
-        }
+
     }
 
     public synchronized Connection getConnection( int connectionid )

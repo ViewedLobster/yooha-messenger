@@ -110,7 +110,7 @@ public class ChatController{
 	
 	public void receiveMessage(String messageString){
             try {
-                Message message = parser.parseMessageXML(messageString);
+                Message message = parser.parseMessageXML(messageString,cipherHandler);
 //System.out.println(MessageDeparser.deparseToHTML(message));
                 addToPane(MessageDeparser.deparseToHTML(message));
             } catch(Exception e){
